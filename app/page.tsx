@@ -1,15 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { Switch } from '@/components/ui/switch'
 
 export default function Page() {
   const [selectedMood, setSelectedMood] = useState<string | null>(null)
-  const [completedTasks, setCompletedTasks] = useState<Record<string, boolean>>({
-    breakfast: false,
-    game: false,
-    break: false,
-  })
 
   const moods = [
     { label: 'Happy', color: 'bg-emerald-100' },
@@ -53,9 +47,9 @@ export default function Page() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pb-24">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       {/* Header */}
-      <div className="px-6 pt-6 pb-8">
+      <div className="px-8 pt-8 pb-8">
         <div className="flex items-start justify-between mb-4">
           <div className="bg-orange-100 rounded-full px-4 py-2 inline-block">
             <span className="text-orange-500 font-semibold text-sm">12 Day Streak</span>
@@ -76,7 +70,7 @@ export default function Page() {
       </div>
 
       {/* How are you feeling section */}
-      <div className="px-6 mb-8">
+      <div className="px-8 mb-8">
         <h2 className="text-2xl font-bold text-black mb-6">How are you feeling?</h2>
         <div className="flex justify-between gap-3">
           {moods.map((mood) => (
@@ -97,7 +91,7 @@ export default function Page() {
       </div>
 
       {/* MedGemma Insight card */}
-      <div className="px-6 mb-8">
+      <div className="px-8 mb-8">
         <div className="bg-blue-50 border-2 border-blue-200 rounded-3xl p-6">
           <div className="flex gap-4">
             <div className="w-16 h-16 bg-blue-600 rounded-2xl flex-shrink-0" />
@@ -113,7 +107,7 @@ export default function Page() {
       </div>
 
       {/* Today's Routine */}
-      <div className="px-6">
+      <div className="px-8 pb-8">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-black">Today's Routine</h2>
           <a href="#" className="text-blue-600 font-semibold">
@@ -176,27 +170,7 @@ export default function Page() {
         </div>
       </div>
 
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-4">
-        <div className="flex justify-around items-center">
-          <a href="#" className="flex flex-col items-center gap-1">
-            <span className="text-2xl">🏠</span>
-            <span className="text-sm font-semibold text-blue-600">Home</span>
-          </a>
-          <a href="#" className="flex flex-col items-center gap-1">
-            <span className="text-2xl">📅</span>
-            <span className="text-sm text-gray-400">Schedule</span>
-          </a>
-          <a href="#" className="flex flex-col items-center gap-1">
-            <span className="text-2xl">🎮</span>
-            <span className="text-sm text-gray-400">Games</span>
-          </a>
-          <a href="#" className="flex flex-col items-center gap-1">
-            <span className="text-2xl">📊</span>
-            <span className="text-sm text-gray-400">Progress</span>
-          </a>
-        </div>
-      </div>
+
     </div>
   )
 }
