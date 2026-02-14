@@ -20,10 +20,12 @@ export default function RootLayout({
     { href: '/', label: '🏠 Home Dashboard' },
     { href: '/daily-wellness', label: '😊 Daily Wellness' },
     { href: '/profiles', label: '👥 Profiles & Setup' },
-    { href: '/meal-plan', label: '🍽️ AI meal Plan - Gel' },
-    { href: '/sensory-schedule', label: '🎵 Sensory & schedule' },
-    { href: '/programs', label: '📋 Programs & analytics' },
-    { href: '/support-network', label: '🤝 Group coordination' },
+    { href: '/meal-plan', label: '🍽️ AI Meal Plan' },
+    { href: '/sensory-schedule', label: '🎵 Sensory & Schedule' },
+    { href: '/programs', label: '📋 Programs & Analytics' },
+    { href: '/support-network', label: '🤝 Support Network' },
+    { href: '/focus-activities', label: '🎮 Focus Activities' },
+    { href: '/ai-chat', label: '💬 AI Assistant' },
   ]
 
   const isActive = (href: string) => {

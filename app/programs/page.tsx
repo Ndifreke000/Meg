@@ -3,112 +3,145 @@
 export default function ProgramsPage() {
   const programs = [
     {
-      name: "Speech Therapy",
-      provider: "Dr. Sarah Johnson",
-      frequency: "2x per week",
-      status: "Active",
-      progress: 65,
-      nextSession: "Tomorrow at 2:00 PM",
+      title: 'Focus Builder',
+      description: 'Cognitive activities to improve attention span',
+      progress: 75,
+      sessions: 12,
+      totalSessions: 16,
+      color: 'bg-blue-500',
     },
     {
-      name: "Occupational Therapy",
-      provider: "Emily Rodriguez",
-      frequency: "1x per week",
-      status: "Active",
+      title: 'Social Skills',
+      description: 'Interactive exercises for communication',
       progress: 45,
-      nextSession: "Thursday at 3:30 PM",
+      sessions: 9,
+      totalSessions: 20,
+      color: 'bg-green-500',
     },
     {
-      name: "Social Skills Group",
-      provider: "Community Center",
-      frequency: "1x per week",
-      status: "Active",
-      progress: 55,
-      nextSession: "Saturday at 10:00 AM",
+      title: 'Emotional Regulation',
+      description: 'Techniques for managing emotions',
+      progress: 60,
+      sessions: 6,
+      totalSessions: 10,
+      color: 'bg-purple-500',
     },
   ]
 
-  const analytics = [
-    { metric: "Session Attendance", value: "92%", trend: "up" },
-    { metric: "Progress Score", value: "7.8/10", trend: "up" },
-    { metric: "Goals Completed", value: "12/18", trend: "up" },
-    { metric: "Avg Session Duration", value: "45 min", trend: "neutral" },
+  const weeklyStats = [
+    { day: 'Mon', focus: 8, mood: 7 },
+    { day: 'Tue', focus: 7, mood: 8 },
+    { day: 'Wed', focus: 9, mood: 9 },
+    { day: 'Thu', focus: 6, mood: 7 },
+    { day: 'Fri', focus: 8, mood: 8 },
+    { day: 'Sat', focus: 7, mood: 9 },
+    { day: 'Sun', focus: 8, mood: 8 },
+  ]
+
+  const achievements = [
+    { title: '7-Day Streak', icon: '🔥', earned: true },
+    { title: 'Focus Master', icon: '🎯', earned: true },
+    { title: 'Social Star', icon: '⭐', earned: false },
+    { title: 'Calm Champion', icon: '🧘', earned: true },
   ]
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-6xl mx-auto">
-        {/* Page Header */}
+        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Programs & Analytics</h1>
-          <p className="text-gray-600">Track therapeutic programs and development progress</p>
-        </div>
-
-        {/* Analytics Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          {analytics.map((item, idx) => (
-            <div key={idx} className="bg-white rounded-lg border border-gray-200 p-6">
-              <p className="text-gray-600 text-sm mb-2">{item.metric}</p>
-              <p className="text-3xl font-bold text-gray-900">{item.value}</p>
-              <p className={`text-xs mt-2 ${item.trend === "up" ? "text-green-600" : "text-gray-600"}`}>
-                {item.trend === "up" ? "↑" : "→"} vs last month
-              </p>
-            </div>
-          ))}
+          <p className="text-gray-600">Track progress across therapeutic programs</p>
         </div>
 
         {/* Active Programs */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-8">
+        <div className="mb-8">
           <h2 className="text-xl font-bold text-gray-900 mb-4">Active Programs</h2>
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {programs.map((program, idx) => (
-              <div key={idx} className="border border-gray-200 rounded-lg p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h3 className="text-lg font-bold text-gray-900">{program.name}</h3>
-                    <p className="text-sm text-gray-600">{program.provider}</p>
-                  </div>
-                  <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
-                    {program.status}
-                  </span>
-                </div>
-
-                <p className="text-sm text-gray-600 mb-3">{program.frequency}</p>
-
-                <div className="mb-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-medium text-gray-700">Progress</span>
-                    <span className="text-sm text-gray-600">{program.progress}%</span>
+              <div key={idx} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition">
+                <h3 className="font-bold text-gray-900 mb-2">{program.title}</h3>
+                <p className="text-sm text-gray-600 mb-4">{program.description}</p>
+                
+                {/* Progress Bar */}
+                <div className="mb-3">
+                  <div className="flex justify-between text-xs text-gray-600 mb-1">
+                    <span>Progress</span>
+                    <span>{program.progress}%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
-                      className="bg-blue-600 h-2 rounded-full"
+                      className={`${program.color} h-2 rounded-full transition-all`}
                       style={{ width: `${program.progress}%` }}
                     />
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <p className="text-sm text-gray-600">
-                    <span className="font-semibold">Next:</span> {program.nextSession}
-                  </p>
-                  <button className="text-blue-600 text-sm font-semibold hover:underline">
-                    View Details
-                  </button>
-                </div>
+                <p className="text-sm text-gray-600">
+                  {program.sessions} of {program.totalSessions} sessions completed
+                </p>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <button className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">
-            Add New Program
-          </button>
-          <button className="px-6 py-3 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300 transition">
-            Download Report
-          </button>
+        {/* Weekly Analytics */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Weekly Analytics</h2>
+          
+          {/* Simple Bar Chart */}
+          <div className="flex items-end justify-between gap-2 h-48 mb-4">
+            {weeklyStats.map((stat, idx) => (
+              <div key={idx} className="flex-1 flex flex-col items-center gap-2">
+                <div className="w-full flex flex-col gap-1">
+                  <div
+                    className="bg-blue-500 rounded-t"
+                    style={{ height: `${stat.focus * 10}px` }}
+                    title={`Focus: ${stat.focus}`}
+                  />
+                  <div
+                    className="bg-green-500 rounded-t"
+                    style={{ height: `${stat.mood * 10}px` }}
+                    title={`Mood: ${stat.mood}`}
+                  />
+                </div>
+                <span className="text-xs text-gray-600 font-medium">{stat.day}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex gap-6 justify-center">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-blue-500 rounded" />
+              <span className="text-sm text-gray-600">Focus Score</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-green-500 rounded" />
+              <span className="text-sm text-gray-600">Mood Score</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Achievements */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Achievements</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {achievements.map((achievement, idx) => (
+              <div
+                key={idx}
+                className={`p-4 rounded-xl text-center ${
+                  achievement.earned ? 'bg-yellow-50 border-2 border-yellow-300' : 'bg-gray-100'
+                }`}
+              >
+                <div className={`text-4xl mb-2 ${!achievement.earned && 'opacity-30'}`}>
+                  {achievement.icon}
+                </div>
+                <p className={`text-sm font-semibold ${achievement.earned ? 'text-gray-900' : 'text-gray-400'}`}>
+                  {achievement.title}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
