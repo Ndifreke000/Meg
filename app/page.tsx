@@ -47,9 +47,9 @@ export default function Page() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white w-full">
       {/* Header */}
-      <div className="px-8 pt-8 pb-8">
+      <div className="px-8 pt-8 pb-8 w-full">
         <div className="flex items-start justify-between mb-4">
           <div className="bg-orange-100 rounded-full px-4 py-2 inline-block">
             <span className="text-orange-500 font-semibold text-sm">12 Day Streak</span>
