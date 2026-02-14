@@ -12,17 +12,40 @@ export const metadata: Metadata = {
   generator: 'v0.app',
 }
 
+'use client'
+
+import { usePathname } from 'next/navigation'
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const pathname = usePathname()
+
+  const navItems = [
+    { href: '/', label: '🏠 Home Dashboard' },
+    { href: '/daily-wellness', label: '😊 Daily Wellness' },
+    { href: '/profiles', label: '👥 Profiles & Setup' },
+    { href: '/meal-plan', label: '🍽️ AI meal Plan - Gel' },
+    { href: '/sensory-schedule', label: '🎵 Sensory & schedule' },
+    { href: '/programs', label: '📋 Programs & analytics' },
+    { href: '/support-network', label: '🤝 Group coordination' },
+  ]
+
+  const isActive = (href: string) => {
+    if (href === '/') {
+      return pathname === '/'
+    }
+    return pathname.startsWith(href)
+  }
+
   return (
     <html lang="en">
       <body className="font-sans antialiased bg-gray-50">
-        <div className="flex h-screen">
+        <div className="flex h-screen overflow-hidden">
           {/* Sidebar */}
-          <aside className="w-64 bg-white border-r border-gray-200 flex flex-col overflow-y-auto">
+          <aside className="w-64 bg-white border-r border-gray-200 flex flex-col overflow-y-auto flex-shrink-0">
             <div className="p-6">
               <div className="bg-blue-600 text-white rounded-lg px-4 py-2 mb-4 inline-flex items-center gap-2">
                 <span className="text-xl">👤</span>
@@ -31,48 +54,19 @@ export default function RootLayout({
             </div>
 
             <nav className="flex-1 px-4 space-y-1">
-              <a
-                href="/"
-                className="block px-4 py-3 rounded-lg text-blue-600 bg-blue-50 font-medium text-sm"
-              >
-                🏠 Home Dashboard
-              </a>
-              <a
-                href="/daily-wellness"
-                className="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 font-medium text-sm"
-              >
-                😊 Daily Wellness
-              </a>
-              <a
-                href="/profiles"
-                className="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 font-medium text-sm"
-              >
-                👥 Profiles & Setup
-              </a>
-              <a
-                href="/meal-plan"
-                className="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 font-medium text-sm"
-              >
-                🍽️ AI meal Plan - Gel
-              </a>
-              <a
-                href="/sensory-schedule"
-                className="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 font-medium text-sm"
-              >
-                🎵 Sensory & schedule
-              </a>
-              <a
-                href="/programs"
-                className="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 font-medium text-sm"
-              >
-                📋 Programs & analytics
-              </a>
-              <a
-                href="/support-network"
-                className="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 font-medium text-sm"
-              >
-                🤝 Group coordination
-              </a>
+              {navItems.map((item) => (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  className={`block px-4 py-3 rounded-lg font-medium text-sm transition-colors ${
+                    isActive(item.href)
+                      ? 'text-blue-600 bg-blue-50'
+                      : 'text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  {item.label}
+                </a>
+              ))}
 
               <div className="pt-6 mt-6 border-t border-gray-200">
                 <h3 className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
@@ -80,7 +74,11 @@ export default function RootLayout({
                 </h3>
                 <a
                   href="/settings"
-                  className="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 font-medium text-sm"
+                  className={`block px-4 py-3 rounded-lg font-medium text-sm transition-colors ${
+                    isActive('/settings')
+                      ? 'text-blue-600 bg-blue-50'
+                      : 'text-gray-700 hover:bg-gray-50'
+                  }`}
                 >
                   ⚙️ Customization
                 </a>
