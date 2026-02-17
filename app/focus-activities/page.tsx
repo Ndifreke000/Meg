@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 
 export default function FocusActivitiesPage() {
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('medium')
@@ -107,11 +108,10 @@ export default function FocusActivitiesPage() {
               <button
                 key={level}
                 onClick={() => setSelectedDifficulty(level)}
-                className={`px-4 py-2 rounded-lg font-medium capitalize transition ${
-                  selectedDifficulty === level
+                className={`px-4 py-2 rounded-lg font-medium capitalize transition ${selectedDifficulty === level
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
+                  }`}
               >
                 {level}
               </button>
@@ -126,9 +126,10 @@ export default function FocusActivitiesPage() {
             {activities
               .filter((a) => selectedDifficulty === 'all' || a.difficulty === selectedDifficulty)
               .map((activity) => (
-                <div
+                <Link
                   key={activity.id}
-                  className={`${activity.color} rounded-2xl p-6 border-2 border-transparent hover:border-blue-500 hover:shadow-lg transition cursor-pointer`}
+                  href={`/focus-activities/${activity.id}`}
+                  className={`${activity.color} rounded-2xl p-6 border-2 border-transparent hover:border-blue-500 hover:shadow-lg transition cursor-pointer block`}
                 >
                   <div className={`w-16 h-16 ${activity.iconBg} rounded-2xl flex items-center justify-center text-3xl mb-4`}>
                     {activity.icon}
@@ -144,11 +145,11 @@ export default function FocusActivitiesPage() {
                     <span className="text-sm font-semibold text-gray-700">
                       🏆 {activity.points} pts
                     </span>
-                    <button className="px-4 py-2 bg-white text-gray-900 rounded-lg font-semibold hover:bg-gray-50 transition">
+                    <span className="text-gray-900 font-semibold">
                       Start
-                    </button>
+                    </span>
                   </div>
-                </div>
+                </Link>
               ))}
           </div>
         </div>

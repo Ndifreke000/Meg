@@ -8,3 +8,11 @@ node_modules/
 .next/
 .env*.local
 .DS_Store
+
+# Backend build artifacts
+backend/target/
+backend/.env
+backend/health_ai.db
+
+# Python virtual environment
+.venv/

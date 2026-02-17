@@ -1,5 +1,13 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api'
 
+// API Error class
+export class APIError extends Error {
+  constructor(public status: number, message: string) {
+    super(message)
+    this.name = 'APIError'
+  }
+}
+
 export interface Profile {
   id: string
   name: string
@@ -11,7 +19,7 @@ export interface Profile {
 
 export interface MoodLog {
   id: string
-  profile_id: string
+  child_id: string
   mood: string
   energy_level?: number
   notes?: string
@@ -20,7 +28,7 @@ export interface MoodLog {
 
 export interface Routine {
   id: string
-  profile_id: string
+  child_id: string
   title: string
   description?: string
   scheduled_time: string
@@ -32,7 +40,7 @@ export interface Routine {
 
 export interface Activity {
   id: string
-  profile_id: string
+  child_id: string
   activity_type: string
   title: string
   focus_score?: number
@@ -43,7 +51,7 @@ export interface Activity {
 
 export interface MealPlan {
   id: string
-  profile_id: string
+  child_id: string
   meal_type: string
   scheduled_time: string
   items: string[]
@@ -60,7 +68,7 @@ export interface AIInsight {
 }
 
 export interface Analytics {
-  profile_id: string
+  child_id: string
   period: string
   avg_mood_score: number
   avg_focus_score: number
@@ -77,20 +85,40 @@ class APIClient {
   }
 
   private async request<T>(endpoint: string, options?: RequestInit): Promise<T> {
-    const response = await fetch(`${this.baseURL}${endpoint}`, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options?.headers,
-      },
-    })
+    try {
+      let token: string | null = null
+      if (typeof window !== 'undefined') {
+        try {
+          token = localStorage.getItem('token')
+          // Sanitize token to prevent HTTP response splitting
+          if (token && /[\r\n]/.test(token)) {
+            console.warn('Invalid token format detected')
+            token = null
+          }
+        } catch (error) {
+          console.warn('Failed to access localStorage:', error)
+        }
+      }
+      
+      const response = await fetch(`${this.baseURL}${endpoint}`, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` }),
+          ...options?.headers,
+        },
+      })
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: 'Unknown error' }))
-      throw new Error(error.error || `HTTP ${response.status}`)
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: 'Unknown error' }))
+        throw new APIError(response.status, error.error || `HTTP ${response.status}`)
+      }
+
+      return response.json()
+    } catch (error) {
+      if (error instanceof APIError) throw error
+      throw new APIError(0, error instanceof Error ? error.message : 'Network error')
     }
-
-    return response.json()
   }
 
   // Health check
@@ -98,16 +126,30 @@ class APIClient {
     return this.request<{ status: string; service: string }>('/health')
   }
 
-  // Profiles
-  async createProfile(data: Omit<Profile, 'id' | 'created_at'>) {
-    return this.request<Profile>('/profiles', {
+  // Children (aliased as profiles for frontend compatibility)
+  async createChild(data: Omit<Profile, 'id' | 'created_at'>) {
+    return this.request<Profile>('/children', {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        name: data.name,
+        age: data.age,
+        special_needs: data.special_needs,
+        // Map other profile fields as needed
+      }),
     })
   }
 
+  async getChildren() {
+    return this.request<Profile[]>('/children')
+  }
+
+  // Legacy profile methods (deprecated - use children methods)
+  async createProfile(data: Omit<Profile, 'id' | 'created_at'>) {
+    return this.createChild(data)
+  }
+
   async getProfiles() {
-    return this.request<Profile[]>('/profiles')
+    return this.getChildren()
   }
 
   // Mood tracking
@@ -172,6 +214,14 @@ class APIClient {
 
   async getAnalytics(profileId: string) {
     return this.request<Analytics>(`/analytics/${profileId}`)
+  }
+
+  // AI chat
+  async chatWithAI(message: string) {
+    return this.request<{ response: string }>('/ai/chat', {
+      method: 'POST',
+      body: JSON.stringify({ message }),
+    })
   }
 }
 

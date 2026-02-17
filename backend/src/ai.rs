@@ -1,22 +1,22 @@
-use sqlx::PgPool;
+use sqlx::SqlitePool;
 use uuid::Uuid;
 use crate::models::{AIInsight, Analytics, MoodLog, Activity};
 
 /// Generate AI insights using MedGemma + HAI-DEF patterns
-pub async fn generate_insights(pool: &PgPool, profile_id: Uuid) -> Result<Vec<AIInsight>, sqlx::Error> {
+pub async fn generate_insights(pool: &SqlitePool, child_id: Uuid) -> Result<Vec<AIInsight>, sqlx::Error> {
     // Fetch recent mood logs
     let moods = sqlx::query_as::<_, MoodLog>(
-        "SELECT * FROM mood_logs WHERE profile_id = $1 ORDER BY logged_at DESC LIMIT 7"
+        "SELECT * FROM mood_logs WHERE child_id = $1 ORDER BY logged_at DESC LIMIT 7"
     )
-    .bind(profile_id)
+    .bind(child_id.to_string())
     .fetch_all(pool)
     .await?;
 
     // Fetch recent activities
     let activities = sqlx::query_as::<_, Activity>(
-        "SELECT * FROM activities WHERE profile_id = $1 ORDER BY logged_at DESC LIMIT 10"
+        "SELECT * FROM activities WHERE child_id = $1 ORDER BY logged_at DESC LIMIT 10"
     )
-    .bind(profile_id)
+    .bind(child_id.to_string())
     .fetch_all(pool)
     .await?;
 
@@ -87,10 +87,10 @@ pub async fn generate_insights(pool: &PgPool, profile_id: Uuid) -> Result<Vec<AI
 
     // Routine adherence insight
     let completed_routines: i64 = sqlx::query_scalar(
-        "SELECT COUNT(*) FROM routines WHERE profile_id = $1 AND completed = true 
-         AND created_at > NOW() - INTERVAL '7 days'"
+        "SELECT COUNT(*) FROM routines WHERE child_id = $1 AND completed = true 
+         AND created_at > datetime('now', '-7 days')"
     )
-    .bind(profile_id)
+    .bind(child_id.to_string())
     .fetch_one(pool)
     .await?;
 
@@ -110,7 +110,7 @@ pub async fn generate_insights(pool: &PgPool, profile_id: Uuid) -> Result<Vec<AI
 }
 
 /// Generate analytics summary
-pub async fn generate_analytics(pool: &PgPool, profile_id: Uuid) -> Result<Analytics, sqlx::Error> {
+pub async fn generate_analytics(pool: &SqlitePool, child_id: Uuid) -> Result<Analytics, sqlx::Error> {
     // Calculate average mood score (simplified mapping)
     let mood_scores: Vec<f32> = sqlx::query_scalar(
         "SELECT CASE 
@@ -121,9 +121,9 @@ pub async fn generate_analytics(pool: &PgPool, profile_id: Uuid) -> Result<Analy
             ELSE 5.0
          END as score
          FROM mood_logs 
-         WHERE profile_id = $1 AND logged_at > NOW() - INTERVAL '7 days'"
+         WHERE child_id = $1 AND logged_at > datetime('now', '-7 days')"
     )
-    .bind(profile_id)
+    .bind(child_id.to_string())
     .fetch_all(pool)
     .await?;
 
@@ -136,10 +136,10 @@ pub async fn generate_analytics(pool: &PgPool, profile_id: Uuid) -> Result<Analy
     // Calculate average focus score
     let focus_scores: Vec<i32> = sqlx::query_scalar(
         "SELECT focus_score FROM activities 
-         WHERE profile_id = $1 AND focus_score IS NOT NULL 
-         AND logged_at > NOW() - INTERVAL '7 days'"
+         WHERE child_id = $1 AND focus_score IS NOT NULL 
+         AND logged_at > datetime('now', '-7 days')"
     )
-    .bind(profile_id)
+    .bind(child_id.to_string())
     .fetch_all(pool)
     .await?;
 
@@ -151,20 +151,20 @@ pub async fn generate_analytics(pool: &PgPool, profile_id: Uuid) -> Result<Analy
 
     // Count completed routines
     let routines_completed: i32 = sqlx::query_scalar(
-        "SELECT COUNT(*)::int FROM routines 
-         WHERE profile_id = $1 AND completed = true 
-         AND created_at > NOW() - INTERVAL '7 days'"
+        "SELECT COUNT(*) FROM routines 
+         WHERE child_id = $1 AND completed = true 
+         AND created_at > datetime('now', '-7 days')"
     )
-    .bind(profile_id)
+    .bind(child_id.to_string())
     .fetch_one(pool)
     .await?;
 
     // Count total activities
     let total_activities: i32 = sqlx::query_scalar(
-        "SELECT COUNT(*)::int FROM activities 
-         WHERE profile_id = $1 AND logged_at > NOW() - INTERVAL '7 days'"
+        "SELECT COUNT(*) FROM activities 
+         WHERE child_id = $1 AND logged_at > datetime('now', '-7 days')"
     )
-    .bind(profile_id)
+    .bind(child_id.to_string())
     .fetch_one(pool)
     .await?;
 
@@ -182,7 +182,7 @@ pub async fn generate_analytics(pool: &PgPool, profile_id: Uuid) -> Result<Analy
     }
 
     Ok(Analytics {
-        profile_id,
+        child_id,
         period: "7_days".to_string(),
         avg_mood_score,
         avg_focus_score,
