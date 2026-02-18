@@ -10,9 +10,9 @@ export default function DailyWellnessPage() {
   const { currentProfileId } = useCurrentProfile()
   const [isLoggingActivity, setIsLoggingActivity] = useState(false)
   
-  const { data: routines, isLoading: routinesLoading } = useRoutines(currentProfileId)
-  const { data: activities, isLoading: activitiesLoading } = useActivities(currentProfileId)
-  const { data: analytics, isLoading: analyticsLoading } = useAnalytics(currentProfileId)
+  const { data: routines, isLoading: routinesLoading } = useRoutines(currentProfileId || undefined)
+  const { data: activities, isLoading: activitiesLoading } = useActivities(currentProfileId || undefined)
+  const { data: analytics, isLoading: analyticsLoading } = useAnalytics(currentProfileId || undefined)
   const logActivity = useLogActivity()
 
   const handleLogActivity = async () => {

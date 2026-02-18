@@ -11,7 +11,7 @@ export default function SensorySchedulePage() {
   const [selectedActivity, setSelectedActivity] = useState<string | null>(null)
   const [isStartingBreak, setIsStartingBreak] = useState(false)
   
-  const { data: routines, isLoading } = useRoutines(currentProfileId)
+  const { data: routines, isLoading } = useRoutines(currentProfileId || undefined)
   const createRoutine = useCreateRoutine()
   const logActivity = useLogActivity()
 

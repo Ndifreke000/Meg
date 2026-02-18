@@ -72,7 +72,7 @@ export default function PatternPuzzlePage() {
       yellow: 'bg-yellow-500',
       purple: 'bg-purple-500',
       orange: 'bg-orange-500'
-    }[color]
+    }[color] || 'bg-gray-500'
 
     if (shape === 'circle') {
       return <div className={`${size} ${colorClass} rounded-full`} />

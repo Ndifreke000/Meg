@@ -8,9 +8,9 @@ import { Skeleton } from '@/components/ui/skeleton'
 export default function ProgramsPage() {
   const { currentProfileId } = useCurrentProfile()
   
-  const { data: analytics, isLoading: analyticsLoading } = useAnalytics(currentProfileId)
-  const { data: activities, isLoading: activitiesLoading } = useActivities(currentProfileId)
-  const { data: moodHistory, isLoading: moodLoading } = useMoodHistory(currentProfileId)
+  const { data: analytics, isLoading: analyticsLoading } = useAnalytics(currentProfileId || undefined)
+  const { data: activities, isLoading: activitiesLoading } = useActivities(currentProfileId || undefined)
+  const { data: moodHistory, isLoading: moodLoading } = useMoodHistory(currentProfileId || undefined)
 
   // Calculate program progress based on real data
   const focusActivities = activities?.filter(a => a.activity_type.includes('focus')) || []

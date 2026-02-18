@@ -23,7 +23,7 @@ export default function MealPlanPage() {
   const { currentProfileId } = useCurrentProfile()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   
-  const { data: mealPlans, isLoading } = useMealPlans(currentProfileId)
+  const { data: mealPlans, isLoading } = useMealPlans(currentProfileId || undefined)
   const createMealPlan = useCreateMealPlan()
   const { register, handleSubmit, reset, formState: { errors } } = useForm<MealPlanForm>()
 

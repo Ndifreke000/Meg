@@ -155,38 +155,49 @@ class APIClient {
           clearTimeout(timeout)
 
           if (!response.ok) {
-            const error = await response.json().catch(() => ({ error: 'Unknown error' }))
-            throw new APIError(response.status, error.error || `HTTP ${response.status}`)
+            let errorMessage = `HTTP ${response.status}`;
+            try {
+              const errorData = await response.text();
+              const parsed = JSON.parse(errorData);
+              errorMessage = parsed.error || parsed.message || errorMessage;
+            } catch {
+              errorMessage = `HTTP ${response.status}: ${response.statusText || 'Unknown error'}`;
+            }
+            throw new APIError(response.status, errorMessage);
           }
 
-          return response.json()
+          return response.json();
         } catch (fetchError) {
-          clearTimeout(timeout)
+          clearTimeout(timeout);
           
           // Check if it's a network error or abort (timeout)
           const isNetworkError = fetchError instanceof TypeError || 
-                                (fetchError instanceof Error && (fetchError.name === 'AbortError' || fetchError.message.includes('timeout')))
+                                (fetchError instanceof Error && (fetchError.name === 'AbortError' || fetchError.message.includes('timeout')));
           
           if (isNetworkError && !(fetchError instanceof APIError)) {
-            console.error('[v0] Network error - no backend available')
-            throw new APIError(0, `Unable to connect to server at ${this.baseURL}`, true)
+            console.error('[v0] Network error - no backend available');
+            throw new APIError(0, `Unable to connect to server at ${this.baseURL}`, true);
           }
           
-          throw fetchError
+          throw fetchError;
         }
       } catch (error) {
         if (error instanceof APIError) {
-          throw error
+          throw error;
         }
-        console.error('[v0] API request error:', error instanceof Error ? error.message : String(error))
-        throw new APIError(0, error instanceof Error ? error.message : 'Network error', true)
+        console.error('[v0] API request error:', error instanceof Error ? error.message : String(error));
+        throw new APIError(0, error instanceof Error ? error.message : 'Network error', true);
       }
+    } catch (error) {
+      console.error('API request failed:', error);
+      if (error instanceof APIError) throw error;
+      throw new APIError(0, error instanceof Error ? error.message : 'Network error');
     }
   }
 
   // Health check
   async healthCheck() {
-    return this.request<{ status: string; service: string }>('/health')
+    return this.request<{ status: string; service: string }>('/health');
   }
 
   // Children (aliased as profiles for frontend compatibility)
@@ -221,7 +232,7 @@ class APIClient {
     try {
       return await this.request<Profile[]>('/children')
     } catch (error) {
-      if (USE_MOCK_DATA || (error instanceof APIError && error.isNetworkError)) {
+      if (USE_MOCK_DATA || (error instanceof APIError && (error.isNetworkError || error.status === 401))) {
         console.log('[v0] Using mock data for getChildren')
         return MOCK_PROFILES
       }

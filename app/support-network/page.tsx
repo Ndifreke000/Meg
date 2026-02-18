@@ -26,7 +26,7 @@ export default function SupportNetworkPage() {
   const [activeTab, setActiveTab] = useState<'family' | 'professionals' | 'resources'>('family')
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   
-  const { data: guardians, isLoading } = useGuardians(currentProfileId)
+  const { data: guardians, isLoading } = useGuardians(currentProfileId || undefined)
   const createGuardian = useCreateGuardian()
   const { register, handleSubmit, reset, formState: { errors } } = useForm<GuardianForm>()
 
