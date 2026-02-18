@@ -19,20 +19,39 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const { logout, user } = useAuth()
 
-  const navItems = [
-    { href: '/', label: '🏠 Home Dashboard' },
-    { href: '/daily-wellness', label: '😊 Daily Wellness' },
-    { href: '/profiles', label: '👥 Profiles & Setup' },
-    { href: '/meal-plan', label: '🍽️ AI Meal Plan' },
-    { href: '/sensory-schedule', label: '🎵 Sensory & Schedule' },
-    { href: '/programs', label: '📋 Programs & Analytics' },
-    { href: '/support-network', label: '🤝 Support Network' },
-    { href: '/focus-activities', label: '🎮 Focus Activities' },
-    { href: '/ai-chat', label: '💬 AI Assistant' },
-    { href: '/emergency', label: '🚨 Emergency' },
-    { href: '/medications', label: '💊 Medications' },
-    { href: '/reports', label: '📊 Reports' },
-    { href: '/offline', label: '📱 Offline Mode' },
+  const navSections = [
+    {
+      label: 'Main',
+      items: [
+        { href: '/', label: 'Home Dashboard' }
+      ]
+    },
+    {
+      label: 'My Child',
+      items: [
+        { href: '/profiles', label: 'Profiles & Setup' },
+        { href: '/daily-wellness', label: 'Daily Wellness' },
+        { href: '/medications', label: 'Medications' }
+      ]
+    },
+    {
+      label: 'Activities',
+      items: [
+        { href: '/focus-activities', label: 'Focus Activities' },
+        { href: '/sensory-schedule', label: 'Sensory & Schedule' },
+        { href: '/programs', label: 'Programs & Analytics' },
+        { href: '/ai-chat', label: 'AI Assistant' }
+      ]
+    },
+    {
+      label: 'Health & Care',
+      items: [
+        { href: '/meal-plan', label: 'AI Meal Plan' },
+        { href: '/support-network', label: 'Support Network' },
+        { href: '/reports', label: 'Reports' },
+        { href: '/emergency', label: 'Emergency' }
+      ]
+    }
   ]
 
   const isActive = (href: string) => {
@@ -61,42 +80,45 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
           )}
         </div>
 
-        <nav className="flex-1 px-4 space-y-1">
-          {navItems.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              className={`block px-4 py-3 rounded-lg font-medium text-sm transition-colors ${
-                isActive(item.href)
-                  ? 'text-blue-600 bg-blue-50'
-                  : 'hover:opacity-80'
-              }`}
-              style={{
-                color: isActive(item.href) ? 'var(--accent-color)' : 'var(--text-primary)',
-                backgroundColor: isActive(item.href) ? 'var(--bg-tertiary)' : 'transparent'
-              }}
-            >
-              {item.label}
-            </a>
+        <nav className="flex-1 px-4 space-y-6 overflow-y-auto">
+          {navSections.map((section) => (
+            <div key={section.label}>
+              <h3 className="px-3 text-xs font-semibold uppercase tracking-widest mb-2" style={{color: 'var(--text-secondary)'}}>
+                {section.label}
+              </h3>
+              <div className="space-y-1">
+                {section.items.map((item) => (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    className="block px-4 py-3 rounded-lg font-medium text-sm transition-all duration-200 hover:scale-105"
+                    style={{
+                      color: isActive(item.href) ? '#ffffff' : 'var(--text-primary)',
+                      backgroundColor: isActive(item.href) ? 'var(--accent-color)' : 'transparent',
+                      fontWeight: isActive(item.href) ? '600' : '500'
+                    }}
+                  >
+                    {item.label}
+                  </a>
+                ))}
+              </div>
+            </div>
           ))}
 
-          <div className="pt-6 mt-6" style={{borderTop: '1px solid var(--border-color)'}}>
-            <h3 className="px-4 text-xs font-semibold uppercase tracking-wider mb-3" style={{color: 'var(--text-secondary)'}}>
+          <div className="pt-2" style={{borderTop: '1px solid var(--border-color)'}}>
+            <h3 className="px-3 text-xs font-semibold uppercase tracking-widest mb-2" style={{color: 'var(--text-secondary)'}}>
               Preferences
             </h3>
             <a
               href="/settings"
-              className={`block px-4 py-3 rounded-lg font-medium text-sm transition-colors ${
-                isActive('/settings')
-                  ? 'text-blue-600 bg-blue-50'
-                  : 'hover:opacity-80'
-              }`}
+              className="block px-4 py-3 rounded-lg font-medium text-sm transition-all duration-200 hover:scale-105"
               style={{
-                color: isActive('/settings') ? 'var(--accent-color)' : 'var(--text-primary)',
-                backgroundColor: isActive('/settings') ? 'var(--bg-tertiary)' : 'transparent'
+                color: isActive('/settings') ? '#ffffff' : 'var(--text-primary)',
+                backgroundColor: isActive('/settings') ? 'var(--accent-color)' : 'transparent',
+                fontWeight: isActive('/settings') ? '600' : '500'
               }}
             >
-              ⚙️ Customization
+              Customization
             </a>
           </div>
         </nav>
