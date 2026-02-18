@@ -59,57 +59,54 @@ const themeConfigs = {
   },
 }
 
+const applyThemeToDOM = (newTheme: Theme) => {
+  if (typeof document === 'undefined') return
+  
+  const root = document.documentElement
+  
+  // Remove existing theme classes
+  root.classList.remove('theme-light', 'theme-dark', 'theme-blue', 'theme-green')
+  
+  // Apply new theme class
+  root.classList.add(`theme-${newTheme}`)
+  
+  // Set all CSS variables
+  const config = themeConfigs[newTheme]
+  Object.entries(config).forEach(([key, value]) => {
+    root.style.setProperty(key, value)
+  })
+  
+  console.log('[v0] Theme applied:', newTheme)
+}
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>('light')
-  const [mounted, setMounted] = useState(false)
 
+  // Load and apply theme on mount only
   useEffect(() => {
-    setMounted(true)
     try {
       const savedTheme = localStorage.getItem('theme') as Theme
       if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark' || savedTheme === 'blue' || savedTheme === 'green')) {
         setTheme(savedTheme)
-        applyTheme(savedTheme)
+        applyThemeToDOM(savedTheme)
       } else {
-        applyTheme('light')
+        applyThemeToDOM('light')
       }
     } catch (error) {
       console.warn('[v0] Failed to load theme:', error)
-      applyTheme('light')
+      applyThemeToDOM('light')
     }
   }, [])
 
-  const applyTheme = (newTheme: Theme) => {
-    const root = document.documentElement
-    
-    // Remove existing theme classes
-    root.classList.remove('theme-light', 'theme-dark', 'theme-blue', 'theme-green')
-    
-    // Apply new theme class
-    root.classList.add(`theme-${newTheme}`)
-    
-    // Set all CSS variables
-    const config = themeConfigs[newTheme]
-    Object.entries(config).forEach(([key, value]) => {
-      root.style.setProperty(key, value)
-    })
-    
-    console.log('[v0] Theme applied:', newTheme)
-  }
-
   const handleSetTheme = (newTheme: Theme) => {
     setTheme(newTheme)
-    applyTheme(newTheme)
+    applyThemeToDOM(newTheme)
     try {
       localStorage.setItem('theme', newTheme)
       console.log('[v0] Theme saved to localStorage:', newTheme)
     } catch (error) {
       console.warn('[v0] Failed to save theme:', error)
     }
-  }
-
-  if (!mounted) {
-    return <div style={{ backgroundColor: '#faf9f7' }}>{children}</div>
   }
 
   return (

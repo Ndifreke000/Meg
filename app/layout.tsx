@@ -146,7 +146,17 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" style={{
+      '--bg-primary': '#faf9f7',
+      '--bg-secondary': '#f5f3f0',
+      '--bg-tertiary': '#ede9e4',
+      '--text-primary': '#1f2937',
+      '--text-secondary': '#6b7280',
+      '--border-color': '#e5dfd7',
+      '--accent-color': '#2563eb',
+      '--accent-secondary': '#f97316',
+      '--accent-tertiary': '#14b8a6',
+    } as any}>
       <body className="font-sans antialiased" style={{backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)'}}>
         <QueryProvider>
           <AuthProvider>

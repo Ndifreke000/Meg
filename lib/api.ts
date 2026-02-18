@@ -138,43 +138,49 @@ class APIClient {
       console.log('[v0] API request:', fetchUrl)
       
       try {
-        const response = await Promise.race([
-          fetch(fetchUrl, {
+        const controller = new AbortController()
+        const timeout = setTimeout(() => controller.abort(), 10000)
+        
+        try {
+          const response = await fetch(fetchUrl, {
             ...options,
+            signal: controller.signal,
             headers: {
               'Content-Type': 'application/json',
               ...(token && { 'Authorization': `Bearer ${token}` }),
               ...options?.headers,
             },
-          }),
-          new Promise<Response>((_, reject) =>
-            setTimeout(() => reject(new Error('Request timeout')), 10000)
-          ),
-        ])
+          })
 
-        if (!response.ok) {
-          const error = await response.json().catch(() => ({ error: 'Unknown error' }))
-          throw new APIError(response.status, error.error || `HTTP ${response.status}`)
-        }
+          clearTimeout(timeout)
 
-        return response.json()
-      } catch (fetchError) {
-        // Check if it's a network error
-        const isNetworkError = fetchError instanceof TypeError || 
-                              (fetchError instanceof Error && fetchError.message.includes('timeout'))
-        
-        console.error('[v0] Network/fetch error:', fetchError instanceof Error ? fetchError.message : 'Unknown')
-        
-        if (isNetworkError) {
-          throw new APIError(0, `Unable to connect to server. Please check if the backend is running at ${this.baseURL}`, true)
+          if (!response.ok) {
+            const error = await response.json().catch(() => ({ error: 'Unknown error' }))
+            throw new APIError(response.status, error.error || `HTTP ${response.status}`)
+          }
+
+          return response.json()
+        } catch (fetchError) {
+          clearTimeout(timeout)
+          
+          // Check if it's a network error or abort (timeout)
+          const isNetworkError = fetchError instanceof TypeError || 
+                                (fetchError instanceof Error && (fetchError.name === 'AbortError' || fetchError.message.includes('timeout')))
+          
+          if (isNetworkError && !(fetchError instanceof APIError)) {
+            console.error('[v0] Network error - no backend available')
+            throw new APIError(0, `Unable to connect to server at ${this.baseURL}`, true)
+          }
+          
+          throw fetchError
         }
-        
-        throw fetchError
+      } catch (error) {
+        if (error instanceof APIError) {
+          throw error
+        }
+        console.error('[v0] API request error:', error instanceof Error ? error.message : String(error))
+        throw new APIError(0, error instanceof Error ? error.message : 'Network error', true)
       }
-    } catch (error) {
-      console.error('[v0] API request failed:', error instanceof Error ? error.message : String(error))
-      if (error instanceof APIError) throw error
-      throw new APIError(0, error instanceof Error ? error.message : 'Network error', true)
     }
   }
 
