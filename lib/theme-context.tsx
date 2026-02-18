@@ -11,71 +11,103 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
+// Complete theme definitions with all CSS variables
+const themeConfigs = {
+  light: {
+    '--bg-primary': '#faf9f7',
+    '--bg-secondary': '#f5f3f0',
+    '--bg-tertiary': '#ede9e4',
+    '--text-primary': '#1f2937',
+    '--text-secondary': '#6b7280',
+    '--border-color': '#e5dfd7',
+    '--accent-color': '#2563eb',
+    '--accent-secondary': '#f97316',
+    '--accent-tertiary': '#14b8a6',
+  },
+  dark: {
+    '--bg-primary': '#1a1a1a',
+    '--bg-secondary': '#252525',
+    '--bg-tertiary': '#323232',
+    '--text-primary': '#f5f3f0',
+    '--text-secondary': '#b8b4af',
+    '--border-color': '#3d3d3d',
+    '--accent-color': '#3b82f6',
+    '--accent-secondary': '#f97316',
+    '--accent-tertiary': '#14b8a6',
+  },
+  blue: {
+    '--bg-primary': '#eff6ff',
+    '--bg-secondary': '#dbeafe',
+    '--bg-tertiary': '#bfdbfe',
+    '--text-primary': '#1e40af',
+    '--text-secondary': '#1e3a8a',
+    '--border-color': '#93c5fd',
+    '--accent-color': '#2563eb',
+    '--accent-secondary': '#3b82f6',
+    '--accent-tertiary': '#60a5fa',
+  },
+  green: {
+    '--bg-primary': '#f0fdf4',
+    '--bg-secondary': '#dcfce7',
+    '--bg-tertiary': '#bbf7d0',
+    '--text-primary': '#166534',
+    '--text-secondary': '#15803d',
+    '--border-color': '#86efac',
+    '--accent-color': '#16a34a',
+    '--accent-secondary': '#22c55e',
+    '--accent-tertiary': '#4ade80',
+  },
+}
+
+const applyThemeToDOM = (newTheme: Theme) => {
+  if (typeof document === 'undefined') return
+  
+  const root = document.documentElement
+  
+  // Remove existing theme classes
+  root.classList.remove('theme-light', 'theme-dark', 'theme-blue', 'theme-green')
+  
+  // Apply new theme class
+  root.classList.add(`theme-${newTheme}`)
+  
+  // Set all CSS variables
+  const config = themeConfigs[newTheme]
+  Object.entries(config).forEach(([key, value]) => {
+    root.style.setProperty(key, value)
+  })
+  
+  console.log('[v0] Theme applied:', newTheme)
+}
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>('light')
-  const [mounted, setMounted] = useState(false)
 
+  // Load and apply theme on mount only
   useEffect(() => {
-    setMounted(true)
     try {
       const savedTheme = localStorage.getItem('theme') as Theme
-      if (savedTheme) {
+      if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark' || savedTheme === 'blue' || savedTheme === 'green')) {
         setTheme(savedTheme)
-        applyTheme(savedTheme)
+        applyThemeToDOM(savedTheme)
+      } else {
+        applyThemeToDOM('light')
       }
     } catch (error) {
-      console.warn('Failed to load theme:', error)
+      console.warn('[v0] Failed to load theme:', error)
+      applyThemeToDOM('light')
     }
   }, [])
 
-  const applyTheme = (newTheme: Theme) => {
-    const root = document.documentElement
-    
-    // Remove existing theme classes
-    root.classList.remove('theme-light', 'theme-dark', 'theme-blue', 'theme-green')
-    
-    // Apply new theme
-    root.classList.add(`theme-${newTheme}`)
-    
-    // Set CSS variables
-    switch (newTheme) {
-      case 'dark':
-        root.style.setProperty('--bg-primary', '#0f172a')
-        root.style.setProperty('--bg-secondary', '#1e293b')
-        root.style.setProperty('--text-primary', '#f8fafc')
-        root.style.setProperty('--text-secondary', '#cbd5e1')
-        break
-      case 'blue':
-        root.style.setProperty('--bg-primary', '#eff6ff')
-        root.style.setProperty('--bg-secondary', '#dbeafe')
-        root.style.setProperty('--text-primary', '#1e40af')
-        root.style.setProperty('--text-secondary', '#3730a3')
-        break
-      case 'green':
-        root.style.setProperty('--bg-primary', '#f0fdf4')
-        root.style.setProperty('--bg-secondary', '#dcfce7')
-        root.style.setProperty('--text-primary', '#166534')
-        root.style.setProperty('--text-secondary', '#15803d')
-        break
-      default: // light
-        root.style.setProperty('--bg-primary', '#ffffff')
-        root.style.setProperty('--bg-secondary', '#f8fafc')
-        root.style.setProperty('--text-primary', '#0f172a')
-        root.style.setProperty('--text-secondary', '#475569')
-    }
-  }
-
   const handleSetTheme = (newTheme: Theme) => {
     setTheme(newTheme)
-    applyTheme(newTheme)
+    applyThemeToDOM(newTheme)
     try {
       localStorage.setItem('theme', newTheme)
+      console.log('[v0] Theme saved to localStorage:', newTheme)
     } catch (error) {
-      console.warn('Failed to save theme:', error)
+      console.warn('[v0] Failed to save theme:', error)
     }
   }
-
-  if (!mounted) return null
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme: handleSetTheme }}>

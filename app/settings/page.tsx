@@ -77,10 +77,10 @@ export default function SettingsPage() {
   }
 
   const themes = [
-    { name: 'Light', value: 'light' as const, color: 'bg-white', selected: theme === 'light' },
-    { name: 'Telegram', value: 'dark' as const, color: 'bg-blue-500', selected: theme === 'dark' },
-    { name: 'Discord', value: 'blue' as const, color: 'bg-indigo-500', selected: theme === 'blue' },
-    { name: 'Spotify', value: 'green' as const, color: 'bg-green-500', selected: theme === 'green' },
+    { name: 'Light', value: 'light' as const, gradientColor: 'from-amber-100 to-yellow-100', accentColor: '#2563eb', selected: theme === 'light' },
+    { name: 'Dark', value: 'dark' as const, gradientColor: 'from-slate-900 to-slate-800', accentColor: '#3b82f6', selected: theme === 'dark' },
+    { name: 'Ocean Blue', value: 'blue' as const, gradientColor: 'from-blue-100 to-cyan-100', accentColor: '#2563eb', selected: theme === 'blue' },
+    { name: 'Forest Green', value: 'green' as const, gradientColor: 'from-green-100 to-emerald-100', accentColor: '#16a34a', selected: theme === 'green' },
   ]
 
   return (
@@ -162,19 +162,25 @@ export default function SettingsPage() {
         </div>
 
         {/* Theme Selection */}
-        <div className="rounded-xl border border-gray-200 p-6 mb-6" style={{backgroundColor: 'var(--bg-secondary)'}}>
+        <div className="rounded-xl p-6 mb-6" style={{backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border-color)'}}>
           <h2 className="text-xl font-bold mb-4" style={{color: 'var(--text-primary)'}}>Theme</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {themes.map((themeOption, idx) => (
               <button
                 key={idx}
                 onClick={() => setTheme(themeOption.value)}
-                className={`p-4 rounded-xl border-2 transition-all ${
-                  themeOption.selected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
-                }`}
+                className={`p-4 rounded-xl transition-all duration-200 border-2`}
+                style={{
+                  backgroundColor: themeOption.selected ? 'var(--bg-tertiary)' : 'var(--bg-primary)',
+                  borderColor: themeOption.selected ? themeOption.accentColor : 'var(--border-color)',
+                  borderWidth: themeOption.selected ? '3px' : '2px',
+                }}
               >
-                <div className={`w-full h-16 ${themeOption.color} rounded-lg mb-2 border border-gray-200`} />
-                <p className="text-sm font-semibold text-gray-900">{themeOption.name}</p>
+                <div className={`w-full h-16 rounded-lg mb-3 border-2 bg-gradient-to-br ${themeOption.gradientColor}`} style={{borderColor: themeOption.accentColor}} />
+                <p className="text-sm font-semibold" style={{color: 'var(--text-primary)'}}>{themeOption.name}</p>
+                {themeOption.selected && (
+                  <p className="text-xs font-medium mt-2" style={{color: themeOption.accentColor}}>✓ Active</p>
+                )}
               </button>
             ))}
           </div>
