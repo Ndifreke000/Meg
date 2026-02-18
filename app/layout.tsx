@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/auth-context'
 import { QueryProvider } from '@/lib/query-provider'
 import { ProfileProvider } from '@/lib/profile-context'
 import { AuthProvider } from '@/lib/auth-context'
+import { ThemeProvider } from '@/lib/theme-context'
 import { Toaster } from '@/components/ui/sonner'
 
 import './globals.css'
@@ -28,6 +29,10 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
     { href: '/support-network', label: '🤝 Support Network' },
     { href: '/focus-activities', label: '🎮 Focus Activities' },
     { href: '/ai-chat', label: '💬 AI Assistant' },
+    { href: '/emergency', label: '🚨 Emergency' },
+    { href: '/medications', label: '💊 Medications' },
+    { href: '/reports', label: '📊 Reports' },
+    { href: '/offline', label: '📱 Offline Mode' },
   ]
 
   const isActive = (href: string) => {
@@ -45,14 +50,14 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col overflow-y-auto flex-shrink-0">
+      <aside className="w-64 flex flex-col overflow-y-auto flex-shrink-0" style={{backgroundColor: 'var(--bg-secondary)', borderRight: '1px solid var(--border-color)'}}>
         <div className="p-6">
-          <div className="bg-blue-600 text-white rounded-lg px-4 py-2 mb-4 inline-flex items-center gap-2">
-            <span className="text-xl">👤</span>
-            <span className="font-semibold text-sm">Family Dashboard</span>
+          <div className="rounded-lg px-4 py-2 mb-4 inline-flex items-center gap-2" style={{backgroundColor: 'var(--accent-color)', color: '#FFFFFF'}}>
+            <span className="text-xl">🏥</span>
+            <span className="font-semibold text-sm">Yosellins</span>
           </div>
           {user && (
-            <p className="text-sm text-gray-600">Welcome, {user.full_name}</p>
+            <p className="text-sm" style={{color: 'var(--text-secondary)'}}>Welcome, {user.full_name}</p>
           )}
         </div>
 
@@ -64,15 +69,19 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
               className={`block px-4 py-3 rounded-lg font-medium text-sm transition-colors ${
                 isActive(item.href)
                   ? 'text-blue-600 bg-blue-50'
-                  : 'text-gray-700 hover:bg-gray-50'
+                  : 'hover:opacity-80'
               }`}
+              style={{
+                color: isActive(item.href) ? 'var(--accent-color)' : 'var(--text-primary)',
+                backgroundColor: isActive(item.href) ? 'var(--bg-tertiary)' : 'transparent'
+              }}
             >
               {item.label}
             </a>
           ))}
 
-          <div className="pt-6 mt-6 border-t border-gray-200">
-            <h3 className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+          <div className="pt-6 mt-6" style={{borderTop: '1px solid var(--border-color)'}}>
+            <h3 className="px-4 text-xs font-semibold uppercase tracking-wider mb-3" style={{color: 'var(--text-secondary)'}}>
               Preferences
             </h3>
             <a
@@ -80,18 +89,23 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
               className={`block px-4 py-3 rounded-lg font-medium text-sm transition-colors ${
                 isActive('/settings')
                   ? 'text-blue-600 bg-blue-50'
-                  : 'text-gray-700 hover:bg-gray-50'
+                  : 'hover:opacity-80'
               }`}
+              style={{
+                color: isActive('/settings') ? 'var(--accent-color)' : 'var(--text-primary)',
+                backgroundColor: isActive('/settings') ? 'var(--bg-tertiary)' : 'transparent'
+              }}
             >
               ⚙️ Customization
             </a>
           </div>
         </nav>
 
-        <div className="p-4 border-t border-gray-200">
+        <div className="p-4" style={{borderTop: '1px solid var(--border-color)'}}>
           <button 
             onClick={handleSignOut}
-            className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200"
+            className="w-full px-4 py-2 rounded-lg text-sm font-medium hover:opacity-80 transition"
+            style={{backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-primary)'}}
           >
             Sign out
           </button>
@@ -111,12 +125,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="font-sans antialiased bg-gray-50">
+      <body className="font-sans antialiased" style={{backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)'}}>
         <QueryProvider>
           <AuthProvider>
             <ProfileProvider>
-              <LayoutContent>{children}</LayoutContent>
-              <Toaster />
+              <ThemeProvider>
+                <LayoutContent>{children}</LayoutContent>
+                <Toaster />
+              </ThemeProvider>
             </ProfileProvider>
           </AuthProvider>
         </QueryProvider>

@@ -1,5 +1,6 @@
 'use client'
 
+import { useMemo } from 'react'
 import { useCurrentProfile } from '@/lib/profile-context'
 import { useAnalytics, useActivities, useMoodHistory } from '@/hooks/use-api'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -16,7 +17,7 @@ export default function ProgramsPage() {
   const socialActivities = activities?.filter(a => a.activity_type.includes('social')) || []
   const emotionalActivities = activities?.filter(a => a.activity_type.includes('emotional')) || []
 
-  const programs = [
+  const programs = useMemo(() => [
     {
       title: 'Focus Builder',
       description: 'Cognitive activities to improve attention span',
@@ -41,7 +42,7 @@ export default function ProgramsPage() {
       totalSessions: 10,
       color: 'bg-purple-500',
     },
-  ]
+  ], [focusActivities.length, socialActivities.length, emotionalActivities.length])
 
   // Generate weekly stats from real data
   const weeklyStats = Array.from({ length: 7 }, (_, i) => {

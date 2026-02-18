@@ -46,7 +46,8 @@ export default function MealPlanPage() {
       setIsDialogOpen(false)
       reset()
     } catch (error) {
-      toast.error('Failed to create meal plan')
+      console.error('Failed to create meal plan:', error)
+      toast.error('Failed to create meal plan. Please try again.')
     }
   }
 
@@ -73,7 +74,8 @@ export default function MealPlanPage() {
       }
       toast.success('AI meal plan generated successfully!')
     } catch (error) {
-      toast.error('Failed to generate meal plan')
+      console.error('Failed to generate meal plan:', error)
+      toast.error('Failed to generate meal plan. Please try again.')
     }
   }
 

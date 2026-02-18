@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api'
-import type { Profile, MoodLog, Routine, Activity, MealPlan, AIInsight, Analytics } from '@/lib/api'
+import type { Profile, MoodLog, Routine, Activity, MealPlan, AIInsight, Analytics, Guardian } from '@/lib/api'
 
 // Profiles (alias for children)
 export function useProfiles() {
@@ -24,7 +24,7 @@ export function useCreateProfile() {
 export function useMoodHistory(childId: string | undefined) {
   return useQuery({
     queryKey: ['mood', childId],
-    queryFn: () => childId ? api.getMoodHistory(childId) : Promise.reject(new Error('No child ID')),
+    queryFn: () => childId ? api.getMoodHistory(childId) : Promise.reject(new Error('No child ID provided')),
     enabled: !!childId,
   })
 }
@@ -44,7 +44,7 @@ export function useLogMood() {
 export function useRoutines(childId: string | undefined) {
   return useQuery({
     queryKey: ['routines', childId],
-    queryFn: () => childId ? api.getRoutines(childId) : Promise.reject('No child ID'),
+    queryFn: () => childId ? api.getRoutines(childId) : Promise.reject(new Error('No child ID provided')),
     enabled: !!childId,
   })
 }
@@ -75,7 +75,7 @@ export function useUpdateRoutineStatus() {
 export function useActivities(childId: string | undefined) {
   return useQuery({
     queryKey: ['activities', childId],
-    queryFn: () => childId ? api.getActivities(childId) : Promise.reject('No child ID'),
+    queryFn: () => childId ? api.getActivities(childId) : Promise.reject(new Error('No child ID provided')),
     enabled: !!childId,
   })
 }
@@ -95,7 +95,7 @@ export function useLogActivity() {
 export function useMealPlans(childId: string | undefined) {
   return useQuery({
     queryKey: ['meal-plans', childId],
-    queryFn: () => childId ? api.getMealPlans(childId) : Promise.reject('No child ID'),
+    queryFn: () => childId ? api.getMealPlans(childId) : Promise.reject(new Error('No child ID provided')),
     enabled: !!childId,
   })
 }
@@ -114,7 +114,7 @@ export function useCreateMealPlan() {
 export function useAIInsights(childId: string | undefined) {
   return useQuery({
     queryKey: ['insights', childId],
-    queryFn: () => childId ? api.getAIInsights(childId) : Promise.reject('No child ID'),
+    queryFn: () => childId ? api.getAIInsights(childId) : Promise.reject(new Error('No child ID provided')),
     enabled: !!childId,
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
@@ -124,8 +124,27 @@ export function useAIInsights(childId: string | undefined) {
 export function useAnalytics(childId: string | undefined) {
   return useQuery({
     queryKey: ['analytics', childId],
-    queryFn: () => childId ? api.getAnalytics(childId) : Promise.reject('No child ID'),
+    queryFn: () => childId ? api.getAnalytics(childId) : Promise.reject(new Error('No child ID provided')),
     enabled: !!childId,
     staleTime: 5 * 60 * 1000, // 5 minutes
+  })
+}
+
+// Guardians
+export function useGuardians(childId: string | undefined) {
+  return useQuery({
+    queryKey: ['guardians', childId],
+    queryFn: () => childId ? api.getGuardians(childId) : Promise.reject(new Error('No child ID provided')),
+    enabled: !!childId,
+  })
+}
+
+export function useCreateGuardian() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: Omit<Guardian, 'id' | 'created_at'>) => api.createGuardian(data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['guardians', variables.child_id] })
+    },
   })
 }

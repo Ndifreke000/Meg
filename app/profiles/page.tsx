@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useProfiles, useCreateProfile } from '@/hooks/use-api'
+import { useProfiles, useCreateProfile, useGuardians } from '@/hooks/use-api'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -19,7 +19,8 @@ interface ProfileForm {
 
 export default function ProfilesPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const { data: profiles, isLoading } = useProfiles()
+  const { data: profiles, isLoading, error: profilesError } = useProfiles()
+  const { data: guardians, error: guardiansError } = useGuardians(profiles?.[0]?.id)
   const createProfile = useCreateProfile()
   
   const { register, handleSubmit, reset, formState: { errors } } = useForm<ProfileForm>()
@@ -37,16 +38,26 @@ export default function ProfilesPage() {
       setIsDialogOpen(false)
       reset()
     } catch (error) {
-      toast.error('Failed to create profile')
+      console.error('Failed to create profile:', error)
+      toast.error('Failed to create profile. Please try again.')
+    }
+  }
+
+  const getSetupLink = (label: string) => {
+    switch (label) {
+      case 'Therapies & Support': return '/support-network'
+      case 'Emergency Contacts': return '/support-network'
+      case 'Dietary Preferences': return '/meal-plan'
+      default: return '/profiles'
     }
   }
 
   const setupItems = [
-    { label: 'Health & Medical Info', completed: true },
-    { label: 'School & Educational', completed: true },
-    { label: 'Therapies & Support', completed: false },
-    { label: 'Emergency Contacts', completed: true },
-    { label: 'Dietary Preferences', completed: false },
+    { label: 'Health & Medical Info', completed: !!profiles?.some(p => p.special_needs && p.special_needs.length > 0) },
+    { label: 'School & Educational', completed: !!profiles?.some(p => p.age && p.age > 0) },
+    { label: 'Therapies & Support', completed: guardians && guardians.length > 0 },
+    { label: 'Emergency Contacts', completed: guardians && guardians.some(g => g.emergency_contact) },
+    { label: 'Dietary Preferences', completed: false }, // Could link to meal plans
   ]
 
   return (
@@ -141,9 +152,12 @@ export default function ProfilesPage() {
                   {item.label}
                 </span>
                 {!item.completed && (
-                  <button className="ml-auto text-blue-600 text-sm font-semibold hover:underline">
+                  <a 
+                    href={getSetupLink(item.label)}
+                    className="ml-auto text-blue-600 text-sm font-semibold hover:underline"
+                  >
                     Complete
-                  </button>
+                  </a>
                 )}
               </div>
             ))}

@@ -4,6 +4,7 @@ mod db;
 mod ai;
 mod auth;
 mod medgemma;
+mod ai_service;
 
 use actix_web::{web, App, HttpServer, middleware::Logger};
 use actix_web_httpauth::middleware::HttpAuthentication;
@@ -30,6 +31,9 @@ async fn main() -> std::io::Result<()> {
         .expect("Failed to run migrations");
 
     log::info!("Starting Health-AI Backend on 0.0.0.0:8080");
+    
+    // Start embedded AI service
+    ai_service::start_ai_service();
 
     HttpServer::new(move || {
         let cors = Cors::permissive();

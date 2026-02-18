@@ -1,9 +1,53 @@
 'use client'
 
 import { useState } from 'react'
+import { useCurrentProfile } from '@/lib/profile-context'
+import { useGuardians, useCreateGuardian } from '@/hooks/use-api'
+import { toast } from 'sonner'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { useForm } from 'react-hook-form'
+
+interface GuardianForm {
+  name: string
+  relationship: string
+  email?: string
+  phone_number?: string
+  can_pickup: boolean
+  emergency_contact: boolean
+  notes?: string
+}
 
 export default function SupportNetworkPage() {
+  const { currentProfileId } = useCurrentProfile()
   const [activeTab, setActiveTab] = useState<'family' | 'professionals' | 'resources'>('family')
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  
+  const { data: guardians, isLoading } = useGuardians(currentProfileId)
+  const createGuardian = useCreateGuardian()
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<GuardianForm>()
+
+  const onSubmit = async (data: GuardianForm) => {
+    if (!currentProfileId) {
+      toast.error('No profile selected')
+      return
+    }
+
+    try {
+      await createGuardian.mutateAsync({
+        child_id: currentProfileId,
+        ...data
+      })
+      toast.success('Guardian added successfully!')
+      setIsDialogOpen(false)
+      reset()
+    } catch (error) {
+      toast.error('Failed to add guardian')
+    }
+  }
 
   const familyMembers = [
     {
@@ -124,29 +168,101 @@ export default function SupportNetworkPage() {
         {/* Family Tab */}
         {activeTab === 'family' && (
           <div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-              {familyMembers.map((member, idx) => (
-                <div key={idx} className="bg-white rounded-xl border border-gray-200 p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="text-4xl">{member.icon}</div>
+            {/* Real Guardians */}
+            <div className="mb-8">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold text-gray-900">Family & Guardians</h2>
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button>Add Guardian</Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Add Guardian/Contact</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                       <div>
-                        <h3 className="font-bold text-gray-900">{member.name}</h3>
-                        <p className="text-sm text-gray-600">{member.role}</p>
+                        <Label htmlFor="name">Name *</Label>
+                        <Input id="name" {...register('name', { required: 'Name is required' })} />
+                        {errors.name && <p className="text-sm text-red-600 mt-1">{errors.name.message}</p>}
                       </div>
-                    </div>
-                    <div
-                      className={`w-3 h-3 rounded-full ${
-                        member.status === 'online' ? 'bg-green-500' : 'bg-gray-300'
-                      }`}
-                    />
-                  </div>
-                  <p className="text-xs text-gray-500">{member.lastActive}</p>
-                  <button className="w-full mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
-                    Message
-                  </button>
+                      <div>
+                        <Label htmlFor="relationship">Relationship *</Label>
+                        <Input id="relationship" {...register('relationship', { required: 'Relationship is required' })} placeholder="e.g., Mother, Father, Grandparent" />
+                        {errors.relationship && <p className="text-sm text-red-600 mt-1">{errors.relationship.message}</p>}
+                      </div>
+                      <div>
+                        <Label htmlFor="email">Email</Label>
+                        <Input id="email" type="email" {...register('email')} />
+                      </div>
+                      <div>
+                        <Label htmlFor="phone_number">Phone</Label>
+                        <Input id="phone_number" {...register('phone_number')} />
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <input id="can_pickup" type="checkbox" {...register('can_pickup')} />
+                        <Label htmlFor="can_pickup">Can pickup child</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <input id="emergency_contact" type="checkbox" {...register('emergency_contact')} />
+                        <Label htmlFor="emergency_contact">Emergency contact</Label>
+                      </div>
+                      <div>
+                        <Label htmlFor="notes">Notes</Label>
+                        <Input id="notes" {...register('notes')} />
+                      </div>
+                      <div className="flex gap-3">
+                        <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="flex-1">Cancel</Button>
+                        <Button type="submit" disabled={createGuardian.isPending} className="flex-1">
+                          {createGuardian.isPending ? 'Adding...' : 'Add Guardian'}
+                        </Button>
+                      </div>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              </div>
+              
+              {isLoading ? (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {[1, 2, 3].map(i => <Skeleton key={i} className="h-32 w-full" />)}
                 </div>
-              ))}
+              ) : guardians && guardians.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {guardians.map((guardian) => (
+                    <div key={guardian.id} className="bg-white rounded-xl border border-gray-200 p-6">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="text-4xl">👤</div>
+                          <div>
+                            <h3 className="font-bold text-gray-900">{guardian.name}</h3>
+                            <p className="text-sm text-gray-600">{guardian.relationship}</p>
+                          </div>
+                        </div>
+                        {guardian.emergency_contact && (
+                          <span className="px-2 py-1 bg-red-100 text-red-700 text-xs rounded font-semibold">Emergency</span>
+                        )}
+                      </div>
+                      {guardian.phone_number && (
+                        <p className="text-sm text-gray-600 mb-2">📞 {guardian.phone_number}</p>
+                      )}
+                      {guardian.email && (
+                        <p className="text-sm text-gray-600 mb-2">✉️ {guardian.email}</p>
+                      )}
+                      {guardian.can_pickup && (
+                        <span className="inline-block px-2 py-1 bg-green-100 text-green-700 text-xs rounded mb-2">Can pickup</span>
+                      )}
+                      <button className="w-full mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
+                        Contact
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
+                  <p className="text-gray-500 mb-4">No guardians added yet</p>
+                  <p className="text-sm text-gray-400">Add family members and emergency contacts</p>
+                </div>
+              )}
             </div>
 
             {/* Shared Updates */}

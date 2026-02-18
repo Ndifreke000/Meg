@@ -56,23 +56,23 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
+    <div className="min-h-screen py-12 px-4" style={{backgroundColor: 'var(--bg-primary)'}}>
       <div className="w-full max-w-2xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="rounded-2xl shadow-xl p-8" style={{backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border-color)'}}>
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-blue-600 rounded-2xl mx-auto mb-4 flex items-center justify-center">
-              <span className="text-3xl">👤</span>
+            <div className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center" style={{backgroundColor: 'var(--accent-color)'}}>
+              <span className="text-3xl text-white">🏥</span>
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h1>
-            <p className="text-gray-600">Join Health-AI as a Parent/Guardian</p>
+            <h1 className="text-3xl font-bold mb-2" style={{color: 'var(--text-primary)'}}>Create Account</h1>
+            <p style={{color: 'var(--text-secondary)'}}>Join Yosellins as a Parent/Guardian</p>
           </div>
 
           {/* Signup Form */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Personal Information */}
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Personal Information</h2>
+              <h2 className="text-lg font-semibold mb-4" style={{color: 'var(--text-primary)'}}>Personal Information</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="full_name">Full Name *</Label>
@@ -210,7 +210,8 @@ export default function SignupPage() {
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-blue-600 hover:bg-blue-700"
+              className="w-full text-white hover:opacity-90"
+              style={{backgroundColor: 'var(--accent-color)'}}
             >
               {isLoading ? 'Creating Account...' : 'Create Account'}
             </Button>

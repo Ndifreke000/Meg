@@ -35,6 +35,35 @@ export default function SpaceMathPage() {
         setQuestion({ a, b, op, answer })
     }, [])
 
+    const generateHarderQuestion = useCallback(() => {
+        const ops = ['+', '-', '*']
+        const op = ops[Math.floor(Math.random() * ops.length)]
+        let a, b, answer
+
+        // Harder questions based on streak
+        if (op === '+') {
+            a = Math.floor(Math.random() * 100) + 50
+            b = Math.floor(Math.random() * 100) + 50
+            answer = a + b
+        } else if (op === '-') {
+            a = Math.floor(Math.random() * 100) + 50
+            b = Math.floor(Math.random() * a) + 1
+            answer = a - b
+        } else {
+            a = Math.floor(Math.random() * 20) + 10
+            b = Math.floor(Math.random() * 15) + 5
+            answer = a * b
+        }
+
+        setQuestion({ a, b, op, answer })
+    }, [])
+
+    const getDifficultyLevel = () => {
+        if (streak < 3) return 'Easy'
+        if (streak < 6) return 'Medium'
+        return 'Hard'
+    }
+
     const startGame = () => {
         setGameState('playing')
         setScore(0)
@@ -57,15 +86,41 @@ export default function SpaceMathPage() {
         return () => clearInterval(timer)
     }, [gameState, timeLeft, score, highScore])
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value
         setUserInput(value)
 
         if (parseInt(value) === question.answer) {
-            setScore((prev) => prev + 10 + streak)
+            const newScore = score + 10 + streak
+            setScore(newScore)
             setStreak((prev) => prev + 1)
             setUserInput('')
-            generateQuestion()
+            
+            // AI-powered difficulty adjustment
+            if (streak > 0 && streak % 3 === 0) {
+                // Increase difficulty after 3 correct answers
+                generateHarderQuestion()
+            } else {
+                generateQuestion()
+            }
+            
+            // Log activity with AI evaluation
+            try {
+                await fetch('/api/activities', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        child_id: 'current-profile-id', // Replace with actual profile ID
+                        activity_type: 'focus_math',
+                        title: 'Space Math Game',
+                        focus_score: Math.min(10, Math.floor(newScore / 10)),
+                        duration_minutes: Math.floor((60 - timeLeft) / 60),
+                        notes: `Streak: ${streak}, Difficulty: ${getDifficultyLevel()}`
+                    })
+                })
+            } catch (error) {
+                console.log('Failed to log activity:', error)
+            }
         }
     }
 

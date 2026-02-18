@@ -33,7 +33,8 @@ export default function DailyWellnessPage() {
       })
       toast.success('Activity logged successfully!')
     } catch (error) {
-      toast.error('Failed to log activity')
+      console.error('Failed to log activity:', error)
+      toast.error('Failed to log activity. Please try again.')
     } finally {
       setIsLoggingActivity(false)
     }

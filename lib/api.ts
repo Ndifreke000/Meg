@@ -77,6 +77,19 @@ export interface Analytics {
   trends: string[]
 }
 
+export interface Guardian {
+  id: string
+  child_id: string
+  name: string
+  relationship: string
+  email?: string
+  phone_number?: string
+  can_pickup: boolean
+  emergency_contact: boolean
+  notes?: string
+  created_at: string
+}
+
 class APIClient {
   private baseURL: string
 
@@ -115,10 +128,11 @@ class APIClient {
       }
 
       return response.json()
-    } catch (error) {
-      if (error instanceof APIError) throw error
-      throw new APIError(0, error instanceof Error ? error.message : 'Network error')
-    }
+      } catch (error) {
+        console.error('API request failed:', error)
+        if (error instanceof APIError) throw error
+        throw new APIError(0, error instanceof Error ? error.message : 'Network error')
+      }
   }
 
   // Health check
@@ -222,6 +236,18 @@ class APIClient {
       method: 'POST',
       body: JSON.stringify({ message }),
     })
+  }
+
+  // Guardians
+  async createGuardian(data: Omit<Guardian, 'id' | 'created_at'>) {
+    return this.request<Guardian>('/guardians', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async getGuardians(childId: string) {
+    return this.request<Guardian[]>(`/guardians/${childId}`)
   }
 }
 
