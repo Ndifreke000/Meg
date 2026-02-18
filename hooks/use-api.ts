@@ -7,6 +7,8 @@ export function useProfiles() {
   return useQuery({
     queryKey: ['profiles'],
     queryFn: () => api.getChildren(),
+    retry: 1,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   })
 }
 

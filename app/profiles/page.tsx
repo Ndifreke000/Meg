@@ -22,6 +22,9 @@ export default function ProfilesPage() {
   const { data: profiles, isLoading, error: profilesError } = useProfiles()
   const { data: guardians, error: guardiansError } = useGuardians(profiles?.[0]?.id)
   const createProfile = useCreateProfile()
+
+  const hasError = profilesError || guardiansError
+  const errorMessage = profilesError?.message || guardiansError?.message
   
   const { register, handleSubmit, reset, formState: { errors } } = useForm<ProfileForm>()
 
@@ -63,6 +66,19 @@ export default function ProfilesPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-6xl mx-auto">
+        {/* Error Banner */}
+        {hasError && (
+          <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+            <p className="text-amber-900 font-semibold">⚠️ Connection Issue</p>
+            <p className="text-amber-800 text-sm mt-1">
+              {errorMessage || 'Unable to connect to the server. Using sample data for demonstration.'}
+            </p>
+            <p className="text-amber-700 text-xs mt-2">
+              Make sure the backend server is running, or the app will use sample data.
+            </p>
+          </div>
+        )}
+
         {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Profiles & Setup</h1>
