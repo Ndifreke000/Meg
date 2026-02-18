@@ -27,27 +27,39 @@
 }
 
 .theme-blue {
-  --bg-primary: #1a1a1a;
-  --bg-secondary: #252525;
-  --bg-tertiary: #323232;
-  --text-primary: #f5f3f0;
-  --text-secondary: #b8b4af;
-  --border-color: #3d3d3d;
-  --accent-color: #3b82f6;
-  --accent-secondary: #f97316;
-  --accent-tertiary: #14b8a6;
+  --bg-primary: #eff6ff;
+  --bg-secondary: #dbeafe;
+  --bg-tertiary: #bfdbfe;
+  --text-primary: #1e40af;
+  --text-secondary: #1e3a8a;
+  --border-color: #93c5fd;
+  --accent-color: #2563eb;
+  --accent-secondary: #3b82f6;
+  --accent-tertiary: #60a5fa;
 }
 
 .theme-green {
-  --bg-primary: #1a1a1a;
-  --bg-secondary: #252525;
-  --bg-tertiary: #323232;
-  --text-primary: #f5f3f0;
-  --text-secondary: #b8b4af;
-  --border-color: #3d3d3d;
-  --accent-color: #14b8a6;
+  --bg-primary: #f0fdf4;
+  --bg-secondary: #dcfce7;
+  --bg-tertiary: #bbf7d0;
+  --text-primary: #166534;
+  --text-secondary: #15803d;
+  --border-color: #86efac;
+  --accent-color: #16a34a;
+  --accent-secondary: #22c55e;
+  --accent-tertiary: #4ade80;
+}
+
+.theme-light {
+  --bg-primary: #faf9f7;
+  --bg-secondary: #f5f3f0;
+  --bg-tertiary: #ede9e4;
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --border-color: #e5dfd7;
+  --accent-color: #2563eb;
   --accent-secondary: #f97316;
-  --accent-tertiary: #3b82f6;
+  --accent-tertiary: #14b8a6;
 }
 
 body {
